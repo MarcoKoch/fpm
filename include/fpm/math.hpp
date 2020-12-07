@@ -183,21 +183,24 @@ constexpr inline fixed<B, I, F> fmod(fixed<B, I, F> x, fixed<B, I, F> y) noexcep
         fixed<B, I, F>::from_raw_value(x.raw_value() % y.raw_value());
 }
 
-template <typename B, typename I, unsigned int F>
-constexpr inline fixed<B, I, F> remainder(fixed<B, I, F> x, fixed<B, I, F> y) noexcept
+template <typename BX, typename IX, unsigned int FX, typename BY, typename IY, unsigned int FY>
+constexpr inline typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type remainder(
+    fixed<BX, IX, FX> x, fixed<BY, IY, FY> y) noexcept
 {
     return
         assert(y.raw_value() != 0),
         x - nearbyint(x / y) * y;
 }
 
-template <typename B, typename I, unsigned int F>
-inline fixed<B, I, F> remquo(fixed<B, I, F> x, fixed<B, I, F> y, int* quo) noexcept
+template <typename BX, typename IX, unsigned int FX, typename BY, typename IY, unsigned int FY>
+inline typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type remquo(
+    fixed<BX, IX, FX> x, fixed<BY, IY, FY> y, int* quo) noexcept
 {
+    using ct = typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type;
     assert(y.raw_value() != 0);
     assert(quo != nullptr);
     *quo = x.raw_value() / y.raw_value();
-    return fixed<B, I, F>::from_raw_value(x.raw_value() % y.raw_value());
+    return ct::from_raw_value(ct{x}.raw_value() % ct{y}.raw_value());
 }
 
 //
@@ -275,22 +278,25 @@ fixed<B, I, F> pow(fixed<B, I, F> base, T exp) noexcept
     return result;
 }
 
-template <typename B, typename I, unsigned int F>
-fixed<B, I, F> pow(fixed<B, I, F> base, fixed<B, I, F> exp) noexcept
+template <typename BB, typename IB, unsigned int FB, typename BE, typename IE, unsigned int FE>
+typename std::common_type<fixed<BB, IB, FB>, fixed<BE, IE, FE>>::type pow(
+    fixed<BB, IB, FB> base, fixed<BE, IE, FE> exp) noexcept
 {
-    using Fixed = fixed<B, I, F>;
+    using bt = fixed<BB, IB, FB>;
+    using et = fixed<BE, IE, FE>;
+    using ct = typename std::common_type<fixed<BB, IB, FB>, fixed<BE, IE, FE>>::type;
 
-    if (base == Fixed(0)) {
-        assert(exp > Fixed(0));
-        return Fixed(0);
+    if (base == bt{0}) {
+        assert(exp > et(0));
+        return ct(0);
     }
 
-    if (exp < Fixed(0))
+    if (exp < et(0))
     {
         return 1 / pow(base, -exp);
     }
 
-    constexpr auto FRAC = B(1) << F;
+    constexpr auto FRAC = BE(1) << FE;
     if (exp.raw_value() % FRAC == 0)
     {
         // Non-fractional exponents are easier to calculate
@@ -300,7 +306,7 @@ fixed<B, I, F> pow(fixed<B, I, F> base, fixed<B, I, F> exp) noexcept
     // For negative bases we do not support fractional exponents.
     // Technically fractions with odd denominators could work,
     // but that's too much work to figure out.
-    assert(base > Fixed(0));
+    assert(base > bt(0));
     return exp2(log2(base) * exp);
 }
 
@@ -489,8 +495,9 @@ fixed<B, I, F> sqrt(fixed<B, I, F> x) noexcept
     return Fixed::from_raw_value(static_cast<B>(res));
 }
 
-template <typename B, typename I, unsigned int F>
-fixed<B, I, F> hypot(fixed<B, I, F> x, fixed<B, I, F> y) noexcept
+template <typename BX, typename IX, unsigned int FX, typename BY, typename IY, unsigned int FY>
+typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type hypot(
+    fixed<BX, IX, FX> x, fixed<BY, IY, FY> y) noexcept
 {
     assert(x != 0 || y != 0);
     return sqrt(x*x + y*y);

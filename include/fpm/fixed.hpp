@@ -216,10 +216,12 @@ using fixed_8_24 = fixed<std::int32_t, std::int64_t, 24>;
 // Addition
 //
 
-template <typename B, typename I, unsigned int F>
-constexpr inline fixed<B, I, F> operator+(const fixed<B, I, F>& x, const fixed<B, I, F>& y) noexcept
+template <typename BX, typename IX, unsigned int FX, typename BY, typename IY, unsigned int FY>
+constexpr inline typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type operator+(
+    const fixed<BX, IX, FX>& x, const fixed<BY, IY, FY>& y) noexcept
 {
-    return fixed<B, I, F>(x) += y;
+    using ct = typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type;
+    return ct{x} += ct{y};
 }
 
 template <typename B, typename I, unsigned int F, typename T, typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
@@ -238,10 +240,12 @@ constexpr inline fixed<B, I, F> operator+(T x, const fixed<B, I, F>& y) noexcept
 // Subtraction
 //
 
-template <typename B, typename I, unsigned int F>
-constexpr inline fixed<B, I, F> operator-(const fixed<B, I, F>& x, const fixed<B, I, F>& y) noexcept
+template <typename BX, typename IX, unsigned int FX, typename BY, typename IY, unsigned int FY>
+constexpr inline typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type operator-(
+    const fixed<BX, IX, FX>& x, const fixed<BY, IY, FY>& y) noexcept
 {
-    return fixed<B, I, F>(x) -= y;
+    using ct = typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type;
+    return ct{x} -= ct{y};
 }
 
 template <typename B, typename I, unsigned int F, typename T, typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
@@ -260,10 +264,12 @@ constexpr inline fixed<B, I, F> operator-(T x, const fixed<B, I, F>& y) noexcept
 // Multiplication
 //
 
-template <typename B, typename I, unsigned int F>
-constexpr inline fixed<B, I, F> operator*(const fixed<B, I, F>& x, const fixed<B, I, F>& y) noexcept
+template <typename BX, typename IX, unsigned int FX, typename BY, typename IY, unsigned int FY>
+constexpr inline typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type operator*(
+    const fixed<BX, IX, FX>& x, const fixed<BY, IY, FY>& y) noexcept
 {
-    return fixed<B, I, F>(x) *= y;
+    using ct = typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type;
+    return ct{x} *= ct{y};
 }
 
 template <typename B, typename I, unsigned int F, typename T, typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
@@ -282,10 +288,12 @@ constexpr inline fixed<B, I, F> operator*(T x, const fixed<B, I, F>& y) noexcept
 // Division
 //
 
-template <typename B, typename I, unsigned int F>
-constexpr inline fixed<B, I, F> operator/(const fixed<B, I, F>& x, const fixed<B, I, F>& y) noexcept
+template <typename BX, typename IX, unsigned int FX, typename BY, typename IY, unsigned int FY>
+constexpr inline typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type operator/(
+    const fixed<BX, IX, FX>& x, const fixed<BY, IY, FY>& y) noexcept
 {
-    return fixed<B, I, F>(x) /= y;
+    using ct = typename std::common_type<fixed<BX, IX, FX>, fixed<BY, IY, FY>>::type;
+    return ct{x} /= ct{y};
 }
 
 template <typename B, typename I, unsigned int F, typename T, typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
