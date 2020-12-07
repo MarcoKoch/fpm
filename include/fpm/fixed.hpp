@@ -46,6 +46,31 @@ public:
     constexpr inline explicit fixed(T val) noexcept
         : m_value(static_cast<BaseType>(std::round(val * FRACTION_MULT)))
     {}
+    
+    // Convertes an other fixed-point number where the converted-to type is
+    // capable of representing any possible value of the converted-from type.
+    // The conversion is implicit since there can't be any loss of precision.
+    template <typename B, typename I, unsigned int F,
+        typename std::enable_if<
+            (sizeof(B) * 8 - F <= sizeof(BaseType) * 8 - FractionBits) &&
+            F <= FractionBits
+        >::type* = nullptr>
+    constexpr inline fixed(fixed<B, I, F> other)
+        : m_value(from_fixed_point<F>(other.raw_value()).raw_value())
+    {}
+    
+    // Convertes an other fixed-point number where the converted-to type may not
+    // exactly represent the converted-from value.
+    // The conversion is explicit to avoid accidential loss of precision.
+    // Like static_cast, this truncates bits that don't fit.
+    template <typename B, typename I, unsigned int F,
+        typename std::enable_if<
+                (sizeof(B) * 8 - F > sizeof(BaseType) * 8 - FractionBits) ||
+                (F > FractionBits)
+            >::type* = nullptr>
+    constexpr inline explicit fixed(fixed<B, I, F> other)
+        : m_value(from_fixed_point<F>(other.raw_value()).raw_value())
+    {}
 
     // Explicit conversion to a floating-point type
     template <typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
