@@ -8,6 +8,14 @@
 #include <intrin.h>
 #endif
 
+// This is used to make some functions constexpr if compiled with C++14 or
+// newer, where those functions can't be implemented as constexpr in C++11.
+#if __cplusplus >= 201400
+#   define FPM_CXX14_CONSTEXPR constexpr
+#else
+#   define FPM_CXX14_CONSTEXPR
+#endif
+
 namespace fpm
 {
 
@@ -114,7 +122,7 @@ constexpr inline bool isunordered(fixed<B, I, F> x, fixed<B, I, F> y) noexcept
 // Nearest integer operations
 //
 template <typename B, typename I, unsigned int F>
-inline fixed<B, I, F> ceil(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR inline fixed<B, I, F> ceil(fixed<B, I, F> x) noexcept
 {
     constexpr auto FRAC = B(1) << F;
     auto value = x.raw_value();
@@ -123,7 +131,7 @@ inline fixed<B, I, F> ceil(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-inline fixed<B, I, F> floor(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR inline fixed<B, I, F> floor(fixed<B, I, F> x) noexcept
 {
     constexpr auto FRAC = B(1) << F;
     auto value = x.raw_value();
@@ -132,14 +140,14 @@ inline fixed<B, I, F> floor(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-inline fixed<B, I, F> trunc(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR inline fixed<B, I, F> trunc(fixed<B, I, F> x) noexcept
 {
     constexpr auto FRAC = B(1) << F;
     return fixed<B, I, F>::from_raw_value(x.raw_value() / FRAC * FRAC);
 }
 
 template <typename B, typename I, unsigned int F>
-inline fixed<B, I, F> round(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR inline fixed<B, I, F> round(fixed<B, I, F> x) noexcept
 {
     constexpr auto FRAC = B(1) << F;
     auto value = x.raw_value() / (FRAC / 2);
@@ -147,7 +155,7 @@ inline fixed<B, I, F> round(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> nearbyint(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> nearbyint(fixed<B, I, F> x) noexcept
 {
     // Rounding mode is assumed to be FE_TONEAREST
     constexpr auto FRAC = B(1) << F;
@@ -192,7 +200,7 @@ constexpr inline fixed<B, I, F> remainder(fixed<B, I, F> x, fixed<B, I, F> y) no
 }
 
 template <typename B, typename I, unsigned int F>
-inline fixed<B, I, F> remquo(fixed<B, I, F> x, fixed<B, I, F> y, int* quo) noexcept
+FPM_CXX14_CONSTEXPR inline fixed<B, I, F> remquo(fixed<B, I, F> x, fixed<B, I, F> y, int* quo) noexcept
 {
     assert(y.raw_value() != 0);
     assert(quo != nullptr);
@@ -227,7 +235,7 @@ constexpr inline fixed<B, I, F> nexttoward(fixed<B, I, F> from, fixed<B, I, F> t
 }
 
 template <typename B, typename I, unsigned int F>
-inline fixed<B, I, F> modf(fixed<B, I, F> x, fixed<B, I, F>* iptr) noexcept
+FPM_CXX14_CONSTEXPR inline fixed<B, I, F> modf(fixed<B, I, F> x, fixed<B, I, F>* iptr) noexcept
 {
     const auto raw = x.raw_value();
     constexpr auto FRAC = B{1} << F;
@@ -241,7 +249,7 @@ inline fixed<B, I, F> modf(fixed<B, I, F> x, fixed<B, I, F>* iptr) noexcept
 //
 
 template <typename B, typename I, unsigned int F, typename T, typename std::enable_if<std::is_integral<T>::value>::type* = nullptr>
-fixed<B, I, F> pow(fixed<B, I, F> base, T exp) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> pow(fixed<B, I, F> base, T exp) noexcept
 {
     using Fixed = fixed<B, I, F>;
     constexpr auto FRAC = B(1) << F;
@@ -276,7 +284,7 @@ fixed<B, I, F> pow(fixed<B, I, F> base, T exp) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> pow(fixed<B, I, F> base, fixed<B, I, F> exp) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> pow(fixed<B, I, F> base, fixed<B, I, F> exp) noexcept
 {
     using Fixed = fixed<B, I, F>;
 
@@ -305,7 +313,7 @@ fixed<B, I, F> pow(fixed<B, I, F> base, fixed<B, I, F> exp) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> exp(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> exp(fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
     if (x < Fixed(0)) {
@@ -326,7 +334,7 @@ fixed<B, I, F> exp(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> exp2(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> exp2(fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
     if (x < Fixed(0)) {
@@ -347,13 +355,13 @@ fixed<B, I, F> exp2(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> expm1(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> expm1(fixed<B, I, F> x) noexcept
 {
     return exp(x) - 1;
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> log2(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> log2(fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
     assert(x > Fixed(0));
@@ -379,27 +387,27 @@ fixed<B, I, F> log2(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> log(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> log(fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
     return log2(x) / log2(Fixed::e());
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> log10(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> log10(fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
     return log2(x) / log2(Fixed(10));
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> log1p(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> log1p(fixed<B, I, F> x) noexcept
 {
     return log(1 + x);
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> cbrt(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> cbrt(fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
 
@@ -451,7 +459,7 @@ fixed<B, I, F> cbrt(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> sqrt(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> sqrt(fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
 
@@ -490,7 +498,7 @@ fixed<B, I, F> sqrt(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> hypot(fixed<B, I, F> x, fixed<B, I, F> y) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> hypot(fixed<B, I, F> x, fixed<B, I, F> y) noexcept
 {
     assert(x != 0 || y != 0);
     return sqrt(x*x + y*y);
@@ -501,7 +509,7 @@ fixed<B, I, F> hypot(fixed<B, I, F> x, fixed<B, I, F> y) noexcept
 //
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> sin(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> sin(fixed<B, I, F> x) noexcept
 {
     // This sine uses a fifth-order curve-fitting approximation originally
     // described by Jasper Vijn on coranac.com which has a worst-case
@@ -534,13 +542,13 @@ fixed<B, I, F> sin(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-inline fixed<B, I, F> cos(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR inline fixed<B, I, F> cos(fixed<B, I, F> x) noexcept
 {
     return sin(fixed<B, I, F>::half_pi() + x);
 }
 
 template <typename B, typename I, unsigned int F>
-inline fixed<B, I, F> tan(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR inline fixed<B, I, F> tan(fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
 
@@ -554,7 +562,7 @@ inline fixed<B, I, F> tan(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> atan(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> atan(fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
     if (x < Fixed(0))
@@ -576,7 +584,7 @@ fixed<B, I, F> atan(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> asin(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> asin(fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
     assert(x >= Fixed(-1) && x <= Fixed(+1));
@@ -590,7 +598,7 @@ fixed<B, I, F> asin(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> acos(fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> acos(fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
     assert(x >= Fixed(-1) && x <= Fixed(+1));
@@ -604,7 +612,7 @@ fixed<B, I, F> acos(fixed<B, I, F> x) noexcept
 }
 
 template <typename B, typename I, unsigned int F>
-fixed<B, I, F> atan2(fixed<B, I, F> y, fixed<B, I, F> x) noexcept
+FPM_CXX14_CONSTEXPR fixed<B, I, F> atan2(fixed<B, I, F> y, fixed<B, I, F> x) noexcept
 {
     using Fixed = fixed<B, I, F>;
     if (x == Fixed(0))
